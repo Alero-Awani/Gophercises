@@ -37,18 +37,23 @@ func main(){
 	//print out the problems, get a response from the user then check if the user is correct 
 	// we add a select statement to the for loop that tells us if we get a message from the timer channel then we know that we need to stop the for loop and stop presenting problems 
 	correct := 0
+	
 	for i, p := range problems {
+		fmt.Printf("Problem #%d: %s = ", i+1,p.q)
+		answerCh := make(chan string)
+		go func(){
+			var answer string
+			fmt.Scanf("%s\n", &answer) 
+			answerCh <- answer
+		}()
+
+		//so what this select statement means is that, if we get a message back from the answer channel first, then the timer hasnt run out but if we get from the timer channel first then the answer isnt valid and we return to end the select statement 
 		select { //when we get a message from the timer channel, the for loop will stop, we dont use a break in this situation because it only breaks out of the select and not the for loop
 			// the return statement breaks out of both
 		case <-timer.C:
-			fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
+			fmt.Printf("\nYou scored %d out of %d.\n", correct, len(problems))
 			return
-		default: //this proceeds to print out the problem if we dont get the timer message 
-			fmt.Printf("Problem #%d: %s = ", i+1,p.q)
-			var answer string
-			// here scanf blocks our code because it waits for an input from the user, so even if the timer runs out, it will keep waiting until the person puts the answer to the first question, so we have to change it 
-			fmt.Scanf("%s\n", &answer) //using the reference to answer here to make sure that it has a pointer value to work with so whenever it sets the value we can access it with our variable 
-		
+		case answer := <-answerCh: //if we get an answer from the answer channel , if check to see if it is correct 
 			if answer == p.a {
 				correct++
 			}
