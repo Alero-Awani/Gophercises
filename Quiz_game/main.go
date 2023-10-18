@@ -31,7 +31,8 @@ func main(){
 		exit("Failed to parse the provided CSV file")
 	}
 
-	shuffled_lines := make([][]string, len(lines))
+	// shuffled_lines := make([][]string, len(lines))
+	var shuffled_lines [][]string
 
 	//shuffle with these lines that have been passed in
 	if *random {
@@ -45,6 +46,7 @@ func main(){
 
 	
 	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
+	defer timer.Stop()
 
 	// <-timer.C //here we are waiting for a message from a channel so our code will block until we get that message
 
@@ -60,20 +62,25 @@ func main(){
 			fmt.Scanf("%s\n", &answer)
 			answerCh <- answer
 		}()
+		
 
 		//so what this select statement means is that, if we get a message back from the answer channel first, then the timer hasnt run out but if we get from the timer channel first then the answer isnt valid and we return to end the select statement
 		select { //when we get a message from the timer channel, the for loop will stop, we dont use a break in this situation because it only breaks out of the select and not the for loop
 			// the return statement breaks out of both
 		case <-timer.C:
-			fmt.Printf("\nYou scored %d out of %d.\n", correct, len(problems))
+			fmt.Printf("\nTime's up! %d out of %d.\n", correct, len(problems))
 			return
 		case answer := <-answerCh: //if we get an answer from the answer channel , if check to see if it is correct
 			if answer == p.a {
 				correct++
 			}
+		
 		}
 
 	}
+	//if the user answers all the questions before the timer finishes, display the score 
+	fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
+
 
 }
 
