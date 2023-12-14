@@ -1,5 +1,12 @@
 package main
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
 // import (
 // 	"fmt"
 // 	"math/rand"
@@ -20,3 +27,28 @@ package main
 // 	}
 // 	return vals
 // }
+
+func main(){
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	text := scanner.Text()
+	text = formatText(text)
+	fmt.Println(text)
+
+	comparison_text := strings.ToLower("hey There")
+	fmt.Println(comparison_text)
+
+	if text == comparison_text {
+		fmt.Println("this is correct")
+	} else {
+		fmt.Println("They are not the same")
+	} 
+}
+
+
+
+func formatText(s string) string {
+	s = strings.ToLower(s)
+    return strings.Join(strings.Fields(s), " ")
+}
+
